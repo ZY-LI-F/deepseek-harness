@@ -1,0 +1,858 @@
+.root {
+  /* Keep session state from the conversation slot, but draw in the page's
+     coordinate space so the garland surrounds sidebar, content and details. */
+  position: fixed;
+  z-index: 4;
+  inset:
+    max(10px, env(safe-area-inset-top))
+    max(10px, env(safe-area-inset-right))
+    max(12px, env(safe-area-inset-bottom))
+    max(10px, env(safe-area-inset-left));
+  box-sizing: border-box;
+  min-width: 0;
+  min-height: 0;
+  border: 0;
+  border-radius: var(--garden-radius, 34px);
+  background: transparent;
+  box-shadow: none;
+  color: var(--dsw-alias-label-secondary);
+  font-family: var(--dsw-font-family);
+  pointer-events: none;
+  container-name: task-garden;
+  container-type: size;
+  transition: border-radius 240ms ease;
+}
+
+.root[data-growing='true'] {
+  background: transparent;
+}
+
+.art,
+.garland {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+}
+
+.garland {
+  z-index: 2;
+}
+
+.vineRing {
+  position: absolute;
+  z-index: calc(2 + var(--vine-ring-order));
+  inset: 0;
+  opacity: var(--vine-ring-opacity);
+  transition: opacity 1s linear;
+}
+
+.vineTrack {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.vineStem,
+.vineConnector,
+.vineLauncher {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.vineStem {
+  stroke-dasharray: var(--vine-track-visible) var(--vine-track-gap);
+  stroke-dashoffset: 0;
+  transition: stroke-dasharray 1.6s cubic-bezier(.18, .76, .2, 1);
+}
+
+.vineLauncher {
+  stroke-dasharray: 0 var(--vine-launcher-length);
+  stroke-dashoffset: 0;
+  animation: vine-launch-connect 3.8s cubic-bezier(.16, .72, .22, 1) 1.05s both;
+}
+
+.starterLeaf {
+  fill: #77b58d;
+  stroke: #4d8870;
+  stroke-width: .8px;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: starter-leaf-open .62s cubic-bezier(.18, .78, .22, 1.2) both;
+  animation-delay: calc(2.05s + var(--starter-leaf-index) * .58s);
+}
+
+.vineStemShadow {
+  stroke: var(--vine-stem-shadow, #57977f);
+  stroke-width: 3.4px;
+}
+
+.vineStemHighlight {
+  stroke: var(--vine-stem-highlight, #b5dcc5);
+  stroke-width: 1.15px;
+}
+
+.vineConnector {
+  opacity: .88;
+}
+
+.vineJunction {
+  fill: #77aa94;
+  stroke: #d3eadc;
+  stroke-width: 1.2px;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: vine-junction-breathe 1.4s ease-in-out infinite alternate;
+}
+
+.vineSlot {
+  position: absolute;
+  z-index: 2;
+  top: var(--slot-y);
+  left: var(--slot-x);
+  width: 0;
+  height: 0;
+  transform: rotate(var(--vine-angle));
+  transform-origin: center;
+  transition: top 220ms ease, left 220ms ease, transform 220ms ease;
+}
+
+.timedBorderVine,
+.waitingBorderVine,
+.vineAccent {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: block;
+  width: var(--vine-width);
+  height: var(--vine-height);
+  transform-origin: center;
+  user-select: none;
+  filter: drop-shadow(0 3px 3px color-mix(in srgb, var(--dsw-alias-label-primary) 11%, transparent));
+  will-change: clip-path, opacity;
+}
+
+.vineArt,
+.vineAccentArt {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.vineArt {
+  transform: scaleX(var(--vine-flip));
+}
+
+.vineAccentArt {
+  transform: scaleX(var(--vine-accent-flip));
+}
+
+.timedBorderVine {
+  clip-path: inset(0 var(--vine-hidden) 0 0);
+  opacity: 1;
+  transform: translate(-50%, -50%);
+  transition: clip-path 1s linear;
+}
+
+.waitingBorderVine {
+  opacity: .3;
+  clip-path: inset(0 88% 0 0);
+  transform: translate(-50%, -50%);
+}
+
+[data-growing='true'] .waitingBorderVine {
+  animation: border-vine-wait 1.9s ease-in-out infinite alternate;
+}
+
+.vineAccent {
+  z-index: 2;
+  width: calc(var(--vine-width) * .72);
+  height: calc(var(--vine-height) * .86);
+  opacity: .72;
+  clip-path: inset(0 0 0 0);
+  transform: translate(
+    calc(-50% + var(--vine-accent-x)),
+    calc(-50% + var(--vine-accent-y))
+  );
+  animation: vine-accent-open 2.35s cubic-bezier(.2, .76, .24, 1.08) both;
+  animation-delay: 180ms;
+}
+
+.growthTip {
+  position: absolute;
+  z-index: 4;
+  top: 0;
+  left: calc(var(--vine-width) * -.38);
+  width: 9px;
+  height: 9px;
+  border: 1px solid color-mix(in srgb, #75a99a 70%, white);
+  border-radius: 70% 30% 70% 30%;
+  background: linear-gradient(135deg, #d8f0e5 8%, #73ae9c 72%);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #91c8b5 18%, transparent);
+  transform: translate(-50%, -50%) rotate(35deg);
+  animation: vine-growth-tip 1.35s ease-in-out infinite alternate;
+}
+
+.cornerOrnament {
+  position: absolute;
+  z-index: 4;
+  top: var(--corner-y);
+  left: var(--corner-x);
+  width: 0;
+  height: 0;
+  opacity: 0;
+  animation: corner-ornament-open .82s cubic-bezier(.18, .78, .22, 1.12) both;
+  animation-delay: var(--corner-delay);
+}
+
+.cornerFlowers {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: var(--corner-size);
+  height: calc(var(--corner-size) * .54);
+  object-fit: contain;
+  transform: translate(-50%, -50%) rotate(var(--corner-angle)) scaleX(var(--corner-flip));
+  transform-origin: center;
+  user-select: none;
+  -webkit-user-drag: none;
+  filter: drop-shadow(0 3px 3px color-mix(in srgb, var(--dsw-alias-label-primary) 12%, transparent));
+}
+
+.cornerButterfly {
+  position: absolute;
+  z-index: 2;
+  top: calc(var(--corner-size) * -.38);
+  left: calc(var(--corner-size) * .08);
+  display: block;
+  width: clamp(18px, 2.2cqw, 28px);
+  aspect-ratio: 1;
+  object-fit: contain;
+  transform-origin: center;
+  user-select: none;
+  -webkit-user-drag: none;
+  animation: corner-butterfly-hover 2.5s ease-in-out infinite;
+}
+
+.blueAccentFlower {
+  position: absolute;
+  z-index: 5;
+  top: var(--blue-flower-y);
+  left: var(--blue-flower-x);
+  display: block;
+  width: var(--blue-flower-size);
+  height: var(--blue-flower-size);
+  object-fit: contain;
+  opacity: 0;
+  transform: translate(-50%, -50%) rotate(var(--blue-flower-tilt));
+  transform-origin: center;
+  user-select: none;
+  -webkit-user-drag: none;
+  filter: drop-shadow(0 4px 5px color-mix(in srgb, #315f9d 18%, transparent));
+  animation:
+    blue-accent-bloom 1.45s cubic-bezier(.18, .78, .22, 1.12) both,
+    blue-accent-breathe 4.8s ease-in-out 1.45s infinite alternate;
+}
+
+.flightFlower {
+  position: absolute;
+  z-index: 4;
+  top: var(--flight-origin-y);
+  left: var(--flight-origin-x);
+  display: block;
+  width: var(--flight-width);
+  height: var(--flight-height);
+  object-fit: contain;
+  object-position: center;
+  transform-origin: center;
+  user-select: none;
+  -webkit-user-drag: none;
+  filter: drop-shadow(0 5px 5px color-mix(in srgb, var(--dsw-alias-state-success-primary) 22%, transparent));
+  animation: flower-flight 2.62s linear both;
+}
+
+.attachedBlossom {
+  position: absolute;
+  z-index: 5;
+  top: var(--attached-flower-y);
+  left: var(--attached-flower-x);
+  display: block;
+  width: var(--attached-flower-size);
+  height: var(--attached-flower-size);
+  object-fit: contain;
+  transform: translate(-50%, -50%) rotate(var(--attached-flower-tilt));
+  transform-origin: center;
+  user-select: none;
+  -webkit-user-drag: none;
+  filter: drop-shadow(0 4px 4px color-mix(in srgb, var(--dsw-alias-label-primary) 14%, transparent));
+  animation: attached-blossom-settle .72s cubic-bezier(.18, .78, .22, 1.14) both;
+}
+
+.caretaker {
+  --caretaker-display-height: min(80px, 12cqh);
+  position: fixed;
+  z-index: 5;
+  bottom: clamp(64px, 8vh, 92px);
+  left: clamp(14px, 1.8vw, 26px);
+  width: calc(var(--caretaker-display-height) * .842105);
+  height: var(--caretaker-display-height);
+  max-height: 80px;
+  aspect-ratio: 480 / 570;
+  transform-origin: center bottom;
+}
+
+.caretakerGrass {
+  position: fixed;
+  z-index: 3;
+  bottom: clamp(42px, 5.8vh, 60px);
+  left: clamp(0px, .45vw, 7px);
+  width: clamp(160px, 14vw, 228px);
+  aspect-ratio: 320 / 140;
+  opacity: 0;
+  transform: scale(.18, .1) translateY(10px);
+  transform-origin: center bottom;
+  animation: caretaker-grass-grow 2.8s cubic-bezier(.16, .72, .18, 1.08) .28s both;
+}
+
+.caretakerGrassArt {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+  user-select: none;
+  -webkit-user-drag: none;
+  filter: drop-shadow(0 4px 4px color-mix(in srgb, #315e45 16%, transparent));
+}
+
+.grassDew {
+  position: absolute;
+  z-index: 2;
+  top: 44%;
+  left: 72%;
+  width: 7px;
+  height: 4px;
+  border-radius: 50%;
+  background: color-mix(in srgb, #bff6ff 86%, transparent);
+  box-shadow: -42px 7px 0 -1px color-mix(in srgb, #bff6ff 78%, transparent);
+  opacity: 0;
+}
+
+.caretakerGrass[data-growing='true'] .grassDew {
+  animation: grass-dew-twinkle 2.1s ease-in-out 1.7s infinite;
+}
+
+.caretakerMotion,
+.caretakerFigure,
+.taskCelFigure,
+.taskCel,
+.kissFigure,
+.kissCel {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.caretakerMotion {
+  position: relative;
+  transform-origin: center bottom;
+}
+
+.caretakerFigure {
+  object-fit: contain;
+  object-position: center bottom;
+  user-select: none;
+  -webkit-user-drag: none;
+  filter: drop-shadow(0 7px 6px color-mix(in srgb, var(--dsw-alias-label-primary) 15%, transparent));
+  animation: caretaker-breathe 4.8s ease-in-out infinite;
+}
+
+.taskCelFigure {
+  position: relative;
+  overflow: visible;
+  filter: drop-shadow(0 7px 6px color-mix(in srgb, var(--dsw-alias-label-primary) 15%, transparent));
+}
+
+.taskCel {
+  position: absolute;
+  inset: 0;
+  object-fit: contain;
+  object-position: center bottom;
+  opacity: 0;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.taskCel[data-active='true'] {
+  z-index: 1;
+  opacity: 1;
+}
+
+.kissFigure {
+  position: relative;
+  overflow: visible;
+  filter: drop-shadow(0 7px 6px color-mix(in srgb, var(--dsw-alias-label-primary) 15%, transparent));
+}
+
+.kissCel {
+  position: absolute;
+  inset: 0;
+  object-fit: contain;
+  object-position: center bottom;
+  opacity: 0;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.kissCel[data-active='true'] {
+  z-index: 1;
+  opacity: 1;
+}
+
+.kissHearts {
+  position: absolute;
+  z-index: 3;
+  top: 39%;
+  left: 65%;
+  width: 0;
+  height: 0;
+}
+
+.kissHeart {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: clamp(12px, 11cqw, 18px);
+  aspect-ratio: 1;
+  object-fit: contain;
+  opacity: 0;
+  transform-origin: center;
+  user-select: none;
+  -webkit-user-drag: none;
+  animation: kiss-heart-flight 1.55s cubic-bezier(.18, .74, .22, 1) both;
+  animation-delay: calc(var(--kiss-heart-index) * 260ms + 1120ms);
+}
+
+.caretaker[data-caretaker-action='watering-walk'] {
+  animation: caretaker-grass-wander 8.4s ease-in-out infinite;
+}
+
+.caretaker[data-caretaker-action='watering-walk'] .caretakerMotion,
+.caretaker[data-caretaker-action='wave'] .caretakerMotion,
+.caretaker[data-caretaker-action='dance'] .caretakerMotion,
+.caretaker[data-caretaker-action='admire'] .caretakerMotion,
+.caretaker[data-caretaker-action='cheer'] .caretakerMotion {
+  animation: none;
+}
+
+.caretaker[data-caretaker-action='wink'] .caretakerMotion {
+  animation: caretaker-wink 1.7s ease-in-out both;
+}
+
+.caretaker[data-caretaker-action='bow'] .caretakerMotion {
+  animation: caretaker-bow 2.3s ease-in-out both;
+}
+
+.caretaker[data-caretaker-action='toast'] .caretakerMotion {
+  animation: caretaker-toast 2.8s ease-in-out both;
+}
+
+.caretaker[data-caretaker-action='kiss'] .caretakerMotion {
+  animation: none;
+}
+
+.wateringFlow {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.waterStream,
+.waterStreamGlow {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.waterStreamGlow {
+  stroke: color-mix(in srgb, #8feaff 36%, transparent);
+  stroke-width: 7px;
+  opacity: .58;
+}
+
+.waterStream {
+  stroke: #64d8f5;
+  stroke-width: 2.35px;
+  stroke-dasharray: 5 8;
+  animation: water-stream-travel .62s linear infinite;
+}
+
+.waterDrop {
+  fill: #7ee6ff;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: water-drop-travel 1.08s cubic-bezier(.24, .52, .35, 1) infinite;
+  animation-delay: calc(var(--water-drop-index) * 145ms);
+}
+
+.waterSplash {
+  fill: color-mix(in srgb, #83e6fb 48%, transparent);
+  stroke: #74dff6;
+  stroke-width: 1.2px;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: water-splash-pulse 1.08s ease-out .72s infinite;
+}
+
+.splashDrop {
+  fill: #8ceaff;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: splash-drop-rise 1.08s ease-out infinite;
+  animation-delay: calc(.72s + var(--splash-index) * 145ms);
+}
+
+.bottomGarden {
+  position: absolute;
+  z-index: 3;
+  right: 4px;
+  bottom: 0;
+  left: clamp(88px, 10cqw, 156px);
+  height: clamp(24px, 4cqh, 30px);
+  overflow: hidden;
+}
+
+.bottomVine,
+.waitingBottomVine {
+  position: absolute;
+  bottom: 0;
+  left: var(--plant-x);
+  display: block;
+  width: var(--plant-width);
+  height: var(--plant-height);
+  transform-origin: center bottom;
+  user-select: none;
+  filter: drop-shadow(0 4px 4px color-mix(in srgb, var(--dsw-alias-label-primary) 10%, transparent));
+  will-change: clip-path, opacity;
+}
+
+.bottomVineArt {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+  transform: scaleX(var(--plant-flip));
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.bottomVine {
+  clip-path: inset(0 0 0 0);
+  animation: bottom-vine-spread 2.25s cubic-bezier(.2, .78, .22, 1) both;
+  animation-delay: var(--plant-delay);
+}
+
+.waitingBottomVine {
+  opacity: .2;
+  clip-path: inset(0 90% 0 0);
+  transform: translateX(-50%);
+}
+
+[data-growing='true'] .waitingBottomVine {
+  animation: bottom-vine-wait 1.9s ease-in-out infinite alternate;
+}
+
+.copy {
+  position: absolute;
+  z-index: 6;
+  top: clamp(8px, 2cqh, 16px);
+  left: 50%;
+  display: flex;
+  align-items: baseline;
+  max-width: min(72cqw, 620px);
+  gap: 8px;
+  padding: 5px 10px;
+  border: 1px solid color-mix(in srgb, var(--dsw-alias-border-l2) 58%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--dsw-alias-bg-layer-1) 78%, transparent);
+  box-shadow: var(--dsw-shadow-lv1);
+  transform: translateX(-50%);
+  white-space: nowrap;
+  backdrop-filter: blur(7px);
+}
+
+.title {
+  overflow: hidden;
+  color: var(--dsw-alias-label-primary);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 16px;
+  text-overflow: ellipsis;
+}
+
+.stage,
+.turns {
+  color: var(--dsw-alias-label-caption);
+  font-size: 11px;
+  line-height: 16px;
+}
+
+@keyframes vine-launch-connect {
+  from { opacity: .4; stroke-dasharray: 0 var(--vine-launcher-length); }
+  to { opacity: 1; stroke-dasharray: var(--vine-launcher-length) var(--vine-launcher-length); }
+}
+
+@keyframes vine-junction-breathe {
+  from { opacity: .62; transform: scale(.76); }
+  to { opacity: 1; transform: scale(1.14); }
+}
+
+@keyframes border-vine-wait {
+  from { opacity: .16; clip-path: inset(0 93% 0 0); }
+  to { opacity: .4; clip-path: inset(0 84% 0 0); }
+}
+
+@keyframes vine-accent-open {
+  from { opacity: 0; clip-path: inset(0 99.5% 0 0); }
+  72% { opacity: .8; clip-path: inset(0 5% 0 0); }
+  to { opacity: .72; clip-path: inset(0 0 0 0); }
+}
+
+@keyframes vine-growth-tip {
+  from { opacity: .52; transform: translate(-50%, -50%) rotate(25deg) scale(.78); }
+  to { opacity: 1; transform: translate(-50%, -50%) rotate(45deg) scale(1.08); }
+}
+
+@keyframes corner-ornament-open {
+  from { opacity: 0; transform: scale(.3) rotate(-6deg); }
+  72% { opacity: 1; transform: scale(1.08) rotate(1deg); }
+  to { opacity: 1; transform: scale(1) rotate(0); }
+}
+
+@keyframes corner-butterfly-hover {
+  0%, 100% { transform: translate(-4px, 3px) rotate(-9deg) scale(.94); }
+  50% { transform: translate(5px, -5px) rotate(8deg) scale(1.05); }
+}
+
+@keyframes blue-accent-bloom {
+  from { opacity: 0; transform: translate(-50%, -50%) rotate(var(--blue-flower-tilt)) scale(.28); }
+  72% { opacity: 1; transform: translate(-50%, -50%) rotate(var(--blue-flower-tilt)) scale(1.08); }
+  to { opacity: 1; transform: translate(-50%, -50%) rotate(var(--blue-flower-tilt)) scale(1); }
+}
+
+@keyframes blue-accent-breathe {
+  from { opacity: .92; transform: translate(-50%, -50%) rotate(calc(var(--blue-flower-tilt) - 1.2deg)) scale(.985); }
+  to { opacity: 1; transform: translate(-50%, -50%) rotate(calc(var(--blue-flower-tilt) + 1.2deg)) scale(1.025); }
+}
+
+@keyframes flower-flight {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(.22) rotate(0);
+    animation-timing-function: cubic-bezier(.12, .72, .24, 1);
+  }
+  14% { opacity: 1; }
+  31% {
+    opacity: 1;
+    transform: translate(calc(-50% + var(--flight-drift-x)), calc(-50% + var(--flight-drift-y))) scale(.7) rotate(var(--flight-spin));
+    animation-timing-function: cubic-bezier(.44, .02, .5, .98);
+  }
+  72% {
+    opacity: 1;
+    transform: translate(calc(-50% + var(--flight-mid-x)), calc(-50% + var(--flight-mid-y))) scale(.88) rotate(calc(var(--flight-angle) - 10deg));
+    animation-timing-function: cubic-bezier(.1, .78, .16, 1);
+  }
+  91% {
+    opacity: 1;
+    transform: translate(calc(-50% + var(--flight-near-x)), calc(-50% + var(--flight-near-y))) scale(.94) rotate(calc(var(--flight-angle) - 3deg));
+    animation-timing-function: cubic-bezier(.12, .86, .2, 1.32);
+  }
+  97% {
+    opacity: 1;
+    transform: translate(calc(-50% + var(--flight-target-x)), calc(-56% + var(--flight-target-y))) scale(1.1) rotate(calc(var(--flight-angle) + 2deg));
+  }
+  to {
+    opacity: 1;
+    transform: translate(calc(-50% + var(--flight-target-x)), calc(-50% + var(--flight-target-y))) scale(1) rotate(var(--flight-angle));
+  }
+}
+
+@keyframes attached-blossom-settle {
+  from { opacity: .78; transform: translate(-50%, -56%) rotate(var(--attached-flower-tilt)) scale(1.12); }
+  68% { opacity: 1; transform: translate(-50%, -50%) rotate(var(--attached-flower-tilt)) scale(.96); }
+  to { opacity: 1; transform: translate(-50%, -50%) rotate(var(--attached-flower-tilt)) scale(1); }
+}
+
+@keyframes caretaker-grass-wander {
+  0%, 10%, 100% { transform: translateX(-2px); }
+  44%, 56% { transform: translateX(18px); }
+}
+
+@keyframes caretaker-wave {
+  0% { transform: translateY(2px) rotate(-1deg) scale(.985); }
+  22% { transform: translate(-2px, -4px) rotate(1.4deg) scale(1.018); }
+  46% { transform: translate(2px, -7px) rotate(-.8deg) scale(1.025); }
+  68% { transform: translate(-1px, -4px) rotate(1.2deg) scale(1.012); }
+  86% { transform: translate(1px, -1px) rotate(-.4deg) scale(1.003); }
+  100% { transform: translateY(0) rotate(0) scale(1); }
+}
+
+@keyframes caretaker-wink {
+  0% { transform: translateY(1px) scale(.99); }
+  28% { transform: translateY(-4px) rotate(-.7deg) scale(1.02); }
+  46% { transform: translate(1px, -6px) rotate(.8deg) scale(1.035); }
+  68% { transform: translateY(-4px) rotate(-.5deg) scale(1.02); }
+  86% { transform: translateY(-1px) rotate(.2deg) scale(1.005); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+@keyframes caretaker-bow {
+  0% { transform: translateY(-2px); }
+  22% { transform: translateY(2px) rotate(.8deg) scale(.995); }
+  44%, 62% { transform: translateY(9px) rotate(2deg) scale(.985); }
+  84% { transform: translateY(3px) rotate(.6deg) scale(.998); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes caretaker-dance {
+  0% { transform: translate(-4px, 3px) rotate(-2deg) scale(.99); }
+  20% { transform: translate(-10px, -9px) rotate(-4deg) scale(1.025); }
+  42% { transform: translate(5px, -3px) rotate(2.5deg) scale(1.01); }
+  64% { transform: translate(10px, -10px) rotate(4deg) scale(1.03); }
+  84% { transform: translate(-3px, -2px) rotate(-1.5deg) scale(1.008); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes caretaker-toast {
+  0% { transform: translateY(2px) rotate(-.6deg) scale(.995); }
+  24% { transform: translateY(-3px) rotate(.8deg) scale(1.01); }
+  46% { transform: translate(1px, -7px) rotate(1.4deg) scale(1.02); }
+  66% { transform: translate(1px, -5px) rotate(.5deg) scale(1.012); }
+  86% { transform: translateY(-1px) rotate(-.3deg) scale(1.002); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes kiss-heart-flight {
+  0%, 9% { opacity: 0; transform: translate(-50%, -50%) scale(.2) rotate(-9deg); }
+  18% { opacity: 1; transform: translate(calc(-50% + 5px), calc(-50% - 5px)) scale(.72) rotate(4deg); }
+  44% { opacity: 1; transform: translate(calc(-50% + 17px), calc(-50% - 17px)) scale(1) rotate(-3deg); }
+  72% { opacity: .9; transform: translate(calc(-50% + 34px), calc(-50% - 34px)) scale(.88) rotate(7deg); }
+  100% { opacity: 0; transform: translate(calc(-50% + 55px), calc(-50% - 55px)) scale(.55) rotate(12deg); }
+}
+
+@keyframes caretaker-breathe {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-1px) scale(1.004); }
+}
+
+@keyframes water-stream-travel {
+  from { stroke-dashoffset: 0; }
+  to { stroke-dashoffset: -13; }
+}
+
+@keyframes water-drop-travel {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(.68);
+  }
+  14% { opacity: 1; }
+  78% { opacity: .9; }
+  100% {
+    opacity: 0;
+    transform: translate(var(--water-drop-x), var(--water-drop-y)) scale(1.08);
+  }
+}
+
+@keyframes water-splash-pulse {
+  0%, 58% { opacity: 0; transform: scale(.2); }
+  72% { opacity: .95; transform: scale(.72); }
+  100% { opacity: 0; transform: scale(1.45, .74); }
+}
+
+@keyframes splash-drop-rise {
+  0%, 62% { opacity: 0; transform: translate(0, 0) scale(.45); }
+  72% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--splash-x), -13px) scale(.72); }
+}
+
+@keyframes caretaker-grass-grow {
+  0% { opacity: 0; transform: scale(.18, .1) translateY(10px); filter: saturate(.7); }
+  36% { opacity: 1; }
+  76% { transform: scale(1.035, .94) translateY(0); }
+  100% { opacity: 1; transform: scale(1); filter: saturate(1); }
+}
+
+@keyframes grass-dew-twinkle {
+  0%, 100% { opacity: .2; transform: scale(.72); }
+  48% { opacity: .95; transform: scale(1.18); }
+}
+
+@keyframes starter-leaf-open {
+  0% { opacity: 0; transform: scale(0) rotate(-18deg); }
+  68% { opacity: 1; transform: scale(1.12) rotate(4deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0); }
+}
+
+@keyframes bottom-vine-spread {
+  from { opacity: .36; clip-path: inset(0 99.5% 0 0); }
+  18% { opacity: 1; }
+  76% { opacity: 1; clip-path: inset(0 6% 0 0); }
+  to { opacity: 1; clip-path: inset(0 0 0 0); }
+}
+
+@keyframes bottom-vine-wait {
+  from { opacity: .12; clip-path: inset(0 94% 0 0); }
+  to { opacity: .34; clip-path: inset(0 86% 0 0); }
+}
+
+@container task-garden (max-width: 560px) {
+  .copy { max-width: 68cqw; padding: 4px 8px; }
+  .title,
+  .turns { display: none; }
+  .bottomGarden { left: clamp(94px, 29cqw, 128px); }
+}
+
+@container task-garden (max-height: 210px) {
+  .copy { top: 6px; }
+  .bottomGarden { height: 24px; }
+  .bottomVine,
+  .waitingBottomVine { max-height: 24px; }
+}
+
+@media (max-width: 620px) {
+  .caretaker {
+    bottom: 70px;
+    left: 8px;
+    width: clamp(104px, 28vw, 132px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root,
+  .root * {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+}

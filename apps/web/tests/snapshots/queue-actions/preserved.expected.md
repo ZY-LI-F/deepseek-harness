@@ -3,13 +3,21 @@
     - button "Reply with a one-sentence description" [disabled]
   - img
   - text: Standard mode
+  - combobox "Scene style":
+    - option "Cloud Harbor" [selected]
+    - option "Candy Gearworks"
+    - option "Moonlit Coral Bay"
+  - text: 2.5D
   - button "Session log":
     - text: Session log
     - img
   - tablist:
     - tab "Chat" [selected]
     - tab "Trajectory"
-- text: Reply with a one-sentence description of event sourcing, then stop. {{clock}}
+- region "Cloud Harbor · Ready to explore": Cloud Harbor
+- text: Whale Girl’s Task Garden
+- status: The first sprout appeared
+- text: 1 turns completed Reply with a one-sentence description of event sourcing, then stop. {{clock}}
 - button "Copy":
   - img
 - button "Context injection @deepseek-ai/dsh-system-prompt":

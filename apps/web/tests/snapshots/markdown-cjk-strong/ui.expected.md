@@ -1,13 +1,21 @@
 - banner:
   - navigation "Session hierarchy":
     - button "CJK strong emphasis" [disabled]
+  - combobox "Scene style":
+    - option "Cloud Harbor" [selected]
+    - option "Candy Gearworks"
+    - option "Moonlit Coral Bay"
+  - text: 2.5D
   - button "Session log":
     - text: Session log
     - img
   - tablist:
     - tab "Chat" [selected]
     - tab "Trajectory"
-- text: Render adjacent CJK strong emphasis. {{clock}}
+- region "Cloud Harbor · Ready to explore": Cloud Harbor
+- text: Whale Girl’s Task Garden
+- status: The first sprout appeared
+- text: 1 turns completed Render adjacent CJK strong emphasis. {{clock}}
 - button "Copy":
   - img
 - heading "CJK strong emphasis" [level=2]

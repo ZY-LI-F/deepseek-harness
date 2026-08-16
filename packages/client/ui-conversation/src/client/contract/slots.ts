@@ -51,6 +51,26 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
      */
     'conversation.session.header': { kind: 'single'; scope: 'session' }
     /**
+     * Session-scoped decorative backdrop behind the transcript and composer.
+     * Entries must remain click-through; interactive controls belong in the
+     * header actions seat and may share state through their own service face.
+     */
+    'conversation.viewport.background': {
+      kind: 'list'
+      scope: 'session'
+      owner: ConversationViewportBackgroundOwnerProps
+    }
+    /**
+     * Session-scoped decorative layer centered in the conversation viewport,
+     * above transcript content and below the composer. Entries must remain
+     * click-through and use the framework session hooks for live state.
+     */
+    'conversation.viewport.overlay': {
+      kind: 'list'
+      scope: 'session'
+      owner: ConversationViewportOverlayOwnerProps
+    }
+    /**
      * One button in the session header's action row — the additive way to put
      * a per-session control beside the title without replacing the header.
      * Entries render by ascending `order`; negative values are reserved for
@@ -243,6 +263,18 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
 /** Owner share of the hero agent-preset chip: the shell supplies nothing. */
 export interface HeroAgentPresetOwnerProps {
   /** Marker field: the chip owns its own roster, staging, and menu state. */
+  children?: never
+}
+
+/** Owner share of the centered decorative conversation layer. */
+export interface ConversationViewportOverlayOwnerProps {
+  /** Marker field: entries read session state through the standard hooks. */
+  children?: never
+}
+
+/** Owner share of the click-through conversation backdrop layer. */
+export interface ConversationViewportBackgroundOwnerProps {
+  /** Marker field: entries read session state through the standard hooks. */
   children?: never
 }
 
@@ -569,6 +601,8 @@ export interface ComposerChainProps {
 export type ConversationSlotProps =
   PropsRuntime<'conversation'> & PropsRenderSlots<
     | 'conversation.session' | 'conversation.session.header'
+    | 'conversation.viewport.background'
+    | 'conversation.viewport.overlay'
     | 'conversation.composer' | 'conversation.composer.bar'
     | 'conversation.input.overlay'
     | 'conversation.input.dock' | 'conversation.composer.dock'

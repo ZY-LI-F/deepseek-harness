@@ -138,6 +138,10 @@ describe('web e2e: live-turn interactions (cancel / error / retry)', () => {
       () => page.getByRole('status').filter({ hasText: 'Deep diving...' }).isVisible(),
       { timeout: 10_000 },
     ).toBe(true)
+    await expect.poll(
+      () => page.getByText('partial', { exact: true }).isVisible(),
+      { timeout: 10_000 },
+    ).toBe(true)
     const loadingSnapshot = await captureStableAria(page, '[class*="centerCol"]', scaffold!.workspaceCwd)
     await compareOrRefreshGolden(LOADING_EXPECTED, loadingSnapshot, MODE)
     await page.getByRole('button', { name: 'Stop generating' }).click()

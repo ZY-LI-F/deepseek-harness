@@ -1,0 +1,6 @@
+# Bilingual-pair consistency record (docs/i18n/README.md): the git blob hash of each
+# side as of the last confirmed-consistent state. Both languages carry equal authority;
+# after editing either side, bring the other along and re-record with:
+#   pnpm run verify-translation-pairing --write .agents/notes/implemented/bug-fix/2026-08-15-source-pixel-cat-free-roaming.md
+2026-08-15-source-pixel-cat-free-roaming.md: c017d95016c25813bb10a28450076574c11badcf
+2026-08-15-source-pixel-cat-free-roaming.zh.md: 2542e865821a0969ef700eae28fa9f5ace78156b

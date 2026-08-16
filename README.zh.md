@@ -10,6 +10,10 @@ DeepSeek Harness（`dsh`）是由 [DeepSeek AI](https://deepseek.com) 开发的�
 
 DeepSeek Harness 目前处于 _开发者预览_ 阶段，正在快速迭代。**未来将出现破坏兼容性的变更。**
 
+## 灵魂感 UI 插件
+
+这个分支挂载了三个仅在浏览器运行的趣味展示插件：自由活动的 2D 猫咪、由鲸鱼女孩照料的任务花园，以及三套可切换的平台世界。行为、隐私保证、源码运行方式和包归属见 [Soulful UI 插件说明](docs/user/soulful-plugins/README.md)。
+
 ## 运行
 
 ### 通过 `npm` 运行

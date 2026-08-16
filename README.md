@@ -10,6 +10,10 @@ It uses an architecture where **everything is a plugin**, and is powered by [Cor
 
 DeepSeek Harness is currently in _developer preview_ and is iterating rapidly. **THERE WILL BE COMPATIBILITY-BREAKING CHANGES.**
 
+## Soulful UI plugins
+
+This branch mounts three playful, browser-only presentation plugins: a roaming 2D cat, a task garden tended by a whale girl, and three switchable platform worlds. See the [Soulful UI Plugins guide](docs/user/soulful-plugins/README.md) for behavior, privacy guarantees, source setup, and package ownership.
+
 ## Run
 
 ### Run from `npm`

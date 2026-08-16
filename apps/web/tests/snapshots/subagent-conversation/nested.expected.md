@@ -5,12 +5,18 @@
     - button "event-sourcing researcher"
     - text: /
     - button "example editor" [disabled]
+  - combobox "Scene style":
+    - option "Cloud Harbor" [selected]
+    - option "Candy Gearworks"
+    - option "Moonlit Coral Bay"
+  - text: 2.5D
   - button "Session log":
     - text: Session log
     - img
   - tablist:
     - tab "Chat" [selected]
     - tab "Trajectory"
+- region "Cloud Harbor · Ready to explore": Cloud Harbor
 - text: Give one concrete event sourcing example. {{clock}}
 - button "Copy":
   - img
