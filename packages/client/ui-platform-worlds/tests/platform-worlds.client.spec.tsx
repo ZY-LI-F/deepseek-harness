@@ -2,7 +2,7 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vitest'
 import { createSnapshotStore, type SessionId } from '@deepseek-ai/dsh-client-runtime/client'
-import { bindSnapshotSelector } from '@deepseek-ai/dsh-client-web-react'
+import { bindSnapshotSelector } from '@deepseek-ai/dsh-client-test-runtime'
 import { conversationSnapshot, makeTranslate } from '@deepseek-ai/dsh-client-test-runtime'
 import {
   PlatformWorldBackdrop, type PlatformWorldBackdropProps,

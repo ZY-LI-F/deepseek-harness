@@ -16,6 +16,7 @@ async function bench() {
   } as never, () => null)
   ctx.provide('sessions', {})
   const locale = new LocaleRuntime(ctx)
+  locale.setLocale('zh')
   ctx.provide('locale', locale)
   const fiber = ctx.plugin({ inject: [...inject], apply })
   await fiber.await()

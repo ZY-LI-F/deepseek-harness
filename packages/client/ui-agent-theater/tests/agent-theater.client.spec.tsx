@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   createSnapshotStore, type RunningToolCall, type SessionId,
 } from '@deepseek-ai/dsh-client-runtime/client'
-import { bindSnapshotSelector } from '@deepseek-ai/dsh-client-web-react'
+import { bindSnapshotSelector } from '@deepseek-ai/dsh-client-test-runtime'
 import { conversationSnapshot, makeTranslate } from '@deepseek-ai/dsh-client-test-runtime'
 import { AgentTheater, type AgentTheaterProps } from '../src/client/AgentTheater.tsx'
 import { zh } from '../src/client/locales.ts'

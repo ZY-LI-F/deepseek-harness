@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   createSnapshotStore, type SessionId, type SessionListState, type SessionSummary,
 } from '@deepseek-ai/dsh-client-runtime/client'
-import { bindSnapshotSelector } from '@deepseek-ai/dsh-client-web-react'
+import { bindSnapshotSelector } from '@deepseek-ai/dsh-client-test-runtime'
 import { makeTranslate, workspaceListState } from '@deepseek-ai/dsh-client-test-runtime'
 import {
   deriveBuddyMood, hasRunningSession, PocketBuddy, shouldBuddySettleWithCaretaker, type PocketBuddyProps,

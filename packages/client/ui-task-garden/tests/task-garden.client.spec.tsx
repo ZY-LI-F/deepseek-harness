@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   createSnapshotStore, type ConversationSnapshot, type RunningToolCall, type SessionId,
 } from '@deepseek-ai/dsh-client-runtime/client'
-import { bindSnapshotSelector } from '@deepseek-ai/dsh-client-web-react'
+import { bindSnapshotSelector } from '@deepseek-ai/dsh-client-test-runtime'
 import { conversationSnapshot, makeTranslate } from '@deepseek-ai/dsh-client-test-runtime'
 import type { SessionStatsProjection } from '@deepseek-ai/dsh-session-stats/client'
 import {
