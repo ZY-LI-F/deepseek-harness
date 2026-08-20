@@ -40,6 +40,5 @@
 - button "Send message" [disabled]
 - text: Details
 - button "Close details"
-- text: Click a tool row in the message flow to view its details
-- status: Waiting for your next task
+- text: Click a tool row in the message flow to view its details Waiting for your next task
 - button "Open Pocket Buddy wardrobe"

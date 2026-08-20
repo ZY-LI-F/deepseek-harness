@@ -645,7 +645,7 @@ export function PocketBuddy({
     >
       <PawPrintTrail prints={pawTrail} remove={removePawPrint} />
       <div ref={actorRef} className={css.actor} data-buddy-actor="" data-motion-model="linear-distance-bound-complete-cels">
-        <div className={css.speech} data-speech-anchor="cat-head" role="status">{t(MOOD_LABELS[mood])}</div>
+        <div aria-live="polite" className={css.speech} data-speech-anchor="cat-head">{t(MOOD_LABELS[mood])}</div>
         <button
           type="button"
           className={css.trigger}

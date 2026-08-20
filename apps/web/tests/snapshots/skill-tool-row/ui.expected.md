@@ -1,13 +1,21 @@
 - banner:
   - navigation "Session hierarchy":
     - button "Load the editing-cordis-compositions ski" [disabled]
+  - combobox "Scene style":
+    - option "Cloud Harbor" [selected]
+    - option "Candy Gearworks"
+    - option "Moonlit Coral Bay"
+  - text: 2.5D
   - button "Session log":
     - text: Session log
     - img
   - tablist:
     - tab "Chat" [selected]
     - tab "Trajectory"
-- text: Load the editing-cordis-compositions skill with the skill tool, then reply DONE. {{date}} {{clock}}
+- region "Cloud Harbor · Ready to explore": Cloud Harbor
+- text: Whale Girl’s Task Garden
+- status: The first sprout appeared
+- text: 1 turns completed Load the editing-cordis-compositions skill with the skill tool, then reply DONE. {{date}} {{clock}}
 - button "Copy":
   - img
 - button "Context injection @deepseek-ai/dsh-system-prompt":

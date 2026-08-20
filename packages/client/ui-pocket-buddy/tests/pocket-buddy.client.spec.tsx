@@ -262,7 +262,7 @@ describe('PocketBuddy presentation', () => {
 
   it('opens the wardrobe, switches skin, and toggles persistent motion through store actions', () => {
     const b = mount()
-    expect(screen.getByRole('status').textContent).toBe('在等你安排任务')
+    expect(b.view.container.querySelector('[data-speech-anchor="cat-head"]')?.textContent).toBe('在等你安排任务')
     fireEvent.click(screen.getByRole('button', { name: '打开口袋搭子衣橱' }))
     expect(screen.getByRole('dialog', { name: '口袋搭子' })).toBeTruthy()
 
@@ -433,13 +433,15 @@ describe('PocketBuddy presentation', () => {
   it('walks to the whale girl after pause, then keeps a sleep-first stationary routine', () => {
     vi.useFakeTimers()
     const b = mount(list(summary('s1', { running: true })))
-    expect(screen.getByRole('status').getAttribute('data-speech-anchor')).toBe('cat-head')
-    expect(screen.getByRole('status').textContent).toBe('正在认真上班')
+    const speech = b.view.container.querySelector('[data-speech-anchor="cat-head"]')
+    expect(speech?.getAttribute('aria-live')).toBe('polite')
+    expect(speech?.getAttribute('role')).toBeNull()
+    expect(speech?.textContent).toBe('正在认真上班')
     const root = b.view.container.querySelector('[data-pocket-buddy]')
     act(() => {
       b.sessions.set(list(summary('s1')))
     })
-    expect(screen.getByRole('status').textContent).toBe('任务完成啦')
+    expect(speech?.textContent).toBe('任务完成啦')
     expect(root?.getAttribute('data-companion-mode')).toBe('docking')
     expect(root?.getAttribute('data-companion-anchor')).toBe('whale-girl')
     expect(root?.getAttribute('data-return-path-model')).toBe('direct-to-caretaker')
@@ -457,7 +459,7 @@ describe('PocketBuddy presentation', () => {
       .toBeCloseTo(expectedDock.x, 1)
 
     act(() => { vi.advanceTimersByTime(2400) })
-    expect(screen.getByRole('status').textContent).toBe('在等你安排任务')
+    expect(speech?.textContent).toBe('在等你安排任务')
 
     act(() => { b.sessions.set(list(summary('s1', { running: true }))) })
     expect(root?.getAttribute('data-companion-mode')).toBe('roaming')
