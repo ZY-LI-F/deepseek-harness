@@ -433,6 +433,7 @@ describe('PocketBuddy presentation', () => {
   it('walks to the whale girl after pause, then keeps a sleep-first stationary routine', () => {
     vi.useFakeTimers()
     const b = mount(list(summary('s1', { running: true })))
+    expect(screen.getByRole('status').getAttribute('data-speech-anchor')).toBe('cat-head')
     expect(screen.getByRole('status').textContent).toBe('正在认真上班')
     const root = b.view.container.querySelector('[data-pocket-buddy]')
     act(() => {

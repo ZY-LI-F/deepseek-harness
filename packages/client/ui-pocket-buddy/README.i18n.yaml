@@ -2,5 +2,5 @@
 # side as of the last confirmed-consistent state. Both languages carry equal authority;
 # after editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write packages/client/ui-pocket-buddy/README.md
-README.md: 9838131a9ad90537f5c8da8a492749f9f093e259
-README.zh.md: 2591c3bef123591be063b92d164cfb3dbbea1c0f
+README.md: 1e796d5072adee93314d81b9a7c773cc7b2a7355
+README.zh.md: 831a3d3bef7536177448d5261aa4a5dd9fbdc09a

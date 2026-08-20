@@ -12,6 +12,8 @@ Seven semantic idle actions—wash face, lick paw, stretch, look, sit, sleep, an
 
 Every reviewed cel and alternate-coat raster is normalized independently from the cat silhouette's transparent-pixel bounds. Its longest visible edge is exactly 100 CSS pixels in a viewport-independent render box; Peach Cat cels also share one paw line. This keeps the cat's apparent size stable across coats, standing, grooming, sleeping, and all twelve chase-ball frames without shrinking screen travel or moving the feet off their contact line.
 
+The mood bubble uses that same 100-pixel visible silhouette as its anchor instead of the much taller actor box. It stays horizontally centered over the cat's head with a 4-pixel gap on both wide and compact layouts, so “Working hard” remains close to the character while its action cels change.
+
 Skin, motion, and sound preferences use the slot store's local persistence; the wardrobe's open state remains component-local. Sound starts muted. When explicitly enabled, `SoulAudioRuntime` prefers two embedded 0.56/0.80-second Qwen3-TTS character cues, falls back to bounded Web Audio, and enforces a 30-second global meow cooldown. No runtime network request is made.
 
 The plugin reads only Session summary flags. It does not inspect conversation content, append events, call the model, or make network requests. Unloading its fiber removes the overlay, dictionaries, store seat, and lazily-created audio context; persisted viewing preferences remain available for a later reinstall.
