@@ -3,13 +3,21 @@
     - 'button "Using ONE run_code program: run" [disabled]'
   - img
   - text: Standard mode
+  - combobox "Scene style":
+    - option "Cloud Harbor" [selected]
+    - option "Candy Gearworks"
+    - option "Moonlit Coral Bay"
+  - text: 2.5D
   - button "Session log":
     - text: Session log
     - img
   - tablist:
     - tab "Chat" [selected]
     - tab "Trajectory"
-- text: "Using ONE run_code program: run bash `echo CODE_ROUND_OK`, then read the file missing.txt catching its error in the program. Return an object with both outcomes. Then reply DONE and stop. {{clock}}"
+- region "Cloud Harbor · Ready to explore": Cloud Harbor
+- text: Whale Girl’s Task Garden
+- status: The first sprout appeared
+- text: "1 turns completed Using ONE run_code program: run bash `echo CODE_ROUND_OK`, then read the file missing.txt catching its error in the program. Return an object with both outcomes. Then reply DONE and stop. {{clock}}"
 - button "Copy":
   - img
 - button "Context injection @deepseek-ai/dsh-system-prompt":

@@ -5,6 +5,11 @@
 - button "1 subagent":
   - text: 1 subagent
   - img
+- combobox "Scene style":
+  - option "Cloud Harbor" [selected]
+  - option "Candy Gearworks"
+  - option "Moonlit Coral Bay"
+- text: 2.5D
 - button "Session log":
   - text: Session log
   - img

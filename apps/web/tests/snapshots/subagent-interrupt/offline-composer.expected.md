@@ -5,13 +5,21 @@
     - button "event-sourcing researcher" [disabled]
   - img
   - text: Standard mode
+  - combobox "Scene style":
+    - option "Cloud Harbor" [selected]
+    - option "Candy Gearworks"
+    - option "Moonlit Coral Bay"
+  - text: 2.5D
   - button "Session log":
     - text: Session log
     - img
   - tablist:
     - tab "Chat" [selected]
     - tab "Trajectory"
-- text: Explain event sourcing in one sentence. {{clock}}
+- region "Cloud Harbor · Quest in progress": Cloud Harbor
+- text: Whale Girl’s Task Garden
+- status: A seed is waiting
+- text: 0 turns completed Explain event sourcing in one sentence. {{clock}}
 - button "Copy":
   - img
 - button "Context injection @deepseek-ai/dsh-system-prompt":

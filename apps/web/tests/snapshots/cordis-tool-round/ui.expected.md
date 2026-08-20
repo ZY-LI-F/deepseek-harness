@@ -3,13 +3,21 @@
     - button "Use only Cordis tools. First" [disabled]
   - img
   - text: Standard mode
+  - combobox "Scene style":
+    - option "Cloud Harbor" [selected]
+    - option "Candy Gearworks"
+    - option "Moonlit Coral Bay"
+  - text: 2.5D
   - button "Session log":
     - text: Session log
     - img
   - tablist:
     - tab "Chat" [selected]
     - tab "Trajectory"
-- text: "Use only Cordis tools. First call cordis_inspect_self with no arguments. Then call cordis_define with plugin kind \"new\", idPrefix \"snap\", name \"snapshot noop\", purpose \"does nothing, for the snapshot\", code.host exactly \"return { name: \\\"snapshot-noop\\\", apply(ctx) {} }\" and code.client exactly \"return { inject: [\\\"slots\\\"], apply(ctx) { ctx.slots.register({ name: \\\"shell.overlay\\\", id: \\\"snapshot-probe\\\" }, () => React.createElement(\\\"div\\\", { \\\"data-snapshot-probe\\\": \\\"loaded\\\" })) } }\". Read its returned pluginId and packageId, then call cordis_run with those exact IDs and mode \"run\". After the run request returns, reply exactly CORDIS_UI_READY and stop. {{clock}}"
+- region "Cloud Harbor · Ready to explore": Cloud Harbor
+- text: Whale Girl’s Task Garden
+- status: Growing a healthy crown of leaves
+- text: "3 turns completed Use only Cordis tools. First call cordis_inspect_self with no arguments. Then call cordis_define with plugin kind \"new\", idPrefix \"snap\", name \"snapshot noop\", purpose \"does nothing, for the snapshot\", code.host exactly \"return { name: \\\"snapshot-noop\\\", apply(ctx) {} }\" and code.client exactly \"return { inject: [\\\"slots\\\"], apply(ctx) { ctx.slots.register({ name: \\\"shell.overlay\\\", id: \\\"snapshot-probe\\\" }, () => React.createElement(\\\"div\\\", { \\\"data-snapshot-probe\\\": \\\"loaded\\\" })) } }\". Read its returned pluginId and packageId, then call cordis_run with those exact IDs and mode \"run\". After the run request returns, reply exactly CORDIS_UI_READY and stop. {{clock}}"
 - button "Copy":
   - img
 - button "Context injection @deepseek-ai/dsh-system-prompt":
@@ -66,6 +74,18 @@
   - img
   - img
   - text: Context injection cordis-host-runner
+- paragraph: The Cordis Plugin is running.
+- button "Copy":
+  - img
+- button "Good response":
+  - img
+- button "Bad response":
+  - img
+- button "Branch into a new conversation":
+  - img
+- text: {{clock}} Ran for {{duration}} Use only Cordis tools. Call cordis_stop with pluginId "snap-1". After it succeeds, reply exactly CORDIS_UI_DONE and stop. {{clock}}
+- button "Copy":
+  - img
 - img
 - text: Stop Cordis Plugin snap-1
 - button "Inspect"
@@ -79,14 +99,7 @@
   - img
 - button "Branch into a new conversation":
   - img
-- text: {{clock}} Ran for {{duration}} Use only Cordis tools. Call cordis_stop with pluginId "snap-1". After it succeeds, reply exactly CORDIS_UI_DONE and stop. {{clock}}
-- button "Copy":
-  - img
-- status:
-  - text: "This turn failedllm-replay: script exhausted — session requested model call #7 but its script has only 6; re-record the scenario"
-  - code: UNKNOWN
-- button "Back to bottom":
-  - img
+- text: {{clock}} Ran for {{duration}}
 - textbox "Message the agent"
 - button "Commands":
   - img
@@ -96,4 +109,4 @@
   - img
 - button "0% of context used"
 - button "Send message" [disabled]
-- text: 3 turns · 7 steps LLM {{duration}} · Tool call {{duration}} Cache hit 77% Input 66.5K tok · Output 318 tok
+- text: 3 turns · 7 steps LLM {{duration}} · Tool call {{duration}} Cache hit 77% Input 66.5K tok · Output 321 tok

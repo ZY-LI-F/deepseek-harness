@@ -1,0 +1,228 @@
+.switcher {
+  display: inline-flex;
+  height: 30px;
+  box-sizing: border-box;
+  align-items: center;
+  gap: 5px;
+  padding: 0 7px;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--dsw-alias-bg-layer-2) 92%, transparent);
+  color: var(--dsw-alias-label-secondary);
+  font-family: var(--dsw-font-family);
+  transition: border-color 160ms ease, background-color 160ms ease;
+}
+
+.switcher:hover {
+  border-color: var(--dsw-alias-state-business-primary);
+  background: var(--dsw-alias-interactive-bg-hover);
+}
+
+.switcherGlyph {
+  color: var(--dsw-alias-state-business-primary);
+  font-size: 11px;
+}
+
+.select {
+  max-width: 116px;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--dsw-alias-label-primary);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 28px;
+  cursor: pointer;
+}
+
+.select:focus-visible {
+  outline: 2px solid var(--dsw-alias-state-business-primary);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.depth {
+  padding: 1px 4px;
+  border-radius: 5px;
+  background: var(--dsw-alias-state-business-tertiary);
+  color: var(--dsw-alias-state-business-primary);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .02em;
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  color: var(--dsw-alias-label-primary);
+  font-family: var(--dsw-font-family);
+  isolation: isolate;
+}
+
+.backdrop::after {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background:
+    linear-gradient(90deg, var(--dsw-alias-bg-base) 0%, transparent 18%, transparent 82%, var(--dsw-alias-bg-base) 100%),
+    linear-gradient(180deg, color-mix(in srgb, var(--dsw-alias-bg-base) 32%, transparent), transparent 32%, color-mix(in srgb, var(--dsw-alias-bg-base) 26%, transparent));
+  background-color: color-mix(in srgb, var(--dsw-alias-bg-base) 15%, transparent);
+  content: '';
+}
+
+.backdrop[data-style='candy-gears']::after {
+  background-color: color-mix(in srgb, var(--dsw-alias-bg-base) 34%, transparent);
+}
+
+.backdrop[data-style='moon-coral']::after {
+  background-color: color-mix(in srgb, var(--dsw-alias-bg-base) 40%, transparent);
+}
+
+.worldArt {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: .56;
+  filter: saturate(.92);
+}
+
+.backdrop[data-style='candy-gears'] .worldArt { opacity: .52; }
+.backdrop[data-style='moon-coral'] .worldArt { opacity: .5; }
+
+.worldLabel {
+  position: absolute;
+  right: 24px;
+  bottom: 15px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border: 1px solid color-mix(in srgb, var(--dsw-alias-border-l2) 74%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--dsw-alias-bg-layer-2) 74%, transparent);
+  color: var(--dsw-alias-label-tertiary);
+  font-size: 10px;
+  line-height: 14px;
+  backdrop-filter: blur(8px);
+}
+
+.worldDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--dsw-alias-state-business-primary);
+  box-shadow: 0 0 0 3px var(--dsw-alias-state-business-tertiary);
+}
+
+/* Shared original runner: a round starling scout rather than a franchise character. */
+.runnerShadow { fill: color-mix(in srgb, var(--dsw-alias-label-primary) 20%, transparent); }
+.runnerBody { fill: var(--dsw-alias-state-business-primary); stroke: var(--dsw-alias-state-business-secondary); stroke-width: 2; }
+.runnerScarf { fill: var(--dsw-alias-state-warn-primary); }
+.runnerAntenna,
+.runnerSmile,
+.runnerFoot {
+  fill: none;
+  stroke: var(--dsw-alias-label-primary);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.runnerSpark { fill: var(--dsw-alias-state-warn-primary); stroke: var(--dsw-alias-bg-layer-1); stroke-width: 2; }
+.runnerEye { fill: var(--dsw-alias-bg-layer-1); }
+
+.backdrop[data-running='true'] .runnerMotion {
+  transform-origin: 0 20px;
+  animation: runner-hop 780ms cubic-bezier(.3, .8, .4, 1) infinite;
+}
+
+.backdrop[data-running='true'] .runnerScarf { animation: scarf-wave 440ms ease-in-out infinite alternate; transform-origin: -8px -12px; }
+.backdrop[data-running='true'] .collectibleFloat { animation: collectible-float 900ms ease-in-out infinite alternate; }
+
+/* Cloud Harbor — soft parallax, suspended docks, wind-bell collectible. */
+.cloudSky { fill: color-mix(in srgb, var(--dsw-alias-state-business-tertiary) 62%, var(--dsw-alias-bg-base)); }
+.cloudSun { fill: color-mix(in srgb, var(--dsw-alias-state-warn-tertiary) 70%, var(--dsw-alias-bg-base)); }
+.farClouds { fill: color-mix(in srgb, var(--dsw-alias-bg-layer-1) 78%, transparent); }
+.cloudSails {
+  fill: color-mix(in srgb, var(--dsw-alias-state-business-tertiary) 75%, var(--dsw-alias-bg-layer-1));
+  stroke: var(--dsw-alias-state-business-primary);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.cloudIsland { fill: color-mix(in srgb, var(--dsw-alias-state-business-secondary) 56%, var(--dsw-alias-label-tertiary)); }
+.cloudIslandTop { fill: color-mix(in srgb, var(--dsw-alias-state-success-tertiary) 76%, var(--dsw-alias-bg-layer-1)); }
+.harborPosts { fill: none; stroke: var(--dsw-alias-state-warn-primary); stroke-width: 7; stroke-linecap: round; }
+.harborPosts .rope { stroke: var(--dsw-alias-label-tertiary); stroke-width: 2; }
+.windBell { fill: var(--dsw-alias-state-warn-tertiary); stroke: var(--dsw-alias-state-warn-primary); stroke-width: 3; stroke-linejoin: round; }
+.windBellClapper { fill: var(--dsw-alias-state-warn-primary); }
+.cloudBirds { fill: none; stroke: var(--dsw-alias-label-tertiary); stroke-width: 2; stroke-linecap: round; }
+.backdrop[data-style='cloud-harbor'][data-running='true'] .farClouds { animation: cloud-drift 8s linear infinite alternate; }
+.backdrop[data-style='cloud-harbor'][data-running='true'] .windBell { animation: bell-sway 620ms ease-in-out infinite alternate; transform-origin: 0 -20px; }
+
+/* Candy Gearworks — isometric floor and extrusion create a small 3D factory. */
+.candySky { fill: color-mix(in srgb, var(--dsw-alias-bg-base) 88%, var(--dsw-alias-state-error-primary)); }
+.candyGrid { fill: none; stroke: color-mix(in srgb, var(--dsw-alias-state-business-primary) 17%, transparent); stroke-width: 1.5; }
+.candyTowers { fill: color-mix(in srgb, var(--dsw-alias-state-error-tertiary) 66%, var(--dsw-alias-bg-layer-1)); stroke: var(--dsw-alias-state-error-primary); stroke-width: 1.5; stroke-linejoin: round; }
+.candyTowers .candyTowerSide { fill: color-mix(in srgb, var(--dsw-alias-state-error-secondary) 65%, var(--dsw-alias-label-tertiary)); }
+.candyTowers .candyTowerTop { fill: color-mix(in srgb, var(--dsw-alias-state-warn-tertiary) 80%, var(--dsw-alias-bg-layer-1)); }
+.gears { fill: color-mix(in srgb, var(--dsw-alias-state-warn-tertiary) 72%, var(--dsw-alias-bg-layer-1)); fill-rule: evenodd; stroke: var(--dsw-alias-state-warn-primary); stroke-width: 3; }
+.isoTop { fill: color-mix(in srgb, var(--dsw-alias-state-error-tertiary) 72%, var(--dsw-alias-bg-layer-1)); }
+.isoFront { fill: color-mix(in srgb, var(--dsw-alias-state-error-secondary) 62%, var(--dsw-alias-label-tertiary)); }
+.isoSide { fill: color-mix(in srgb, var(--dsw-alias-state-business-secondary) 54%, var(--dsw-alias-label-tertiary)); }
+.isoPlatforms { stroke: var(--dsw-alias-border-l3); stroke-width: 2; stroke-linejoin: round; }
+.pipeCandy { fill: color-mix(in srgb, var(--dsw-alias-state-success-tertiary) 70%, var(--dsw-alias-bg-layer-1)); stroke: var(--dsw-alias-state-success-primary); stroke-width: 2; }
+.sugarSpark { fill: var(--dsw-alias-state-warn-primary); stroke: var(--dsw-alias-bg-layer-1); stroke-width: 3; }
+.sugarSparkCore { fill: var(--dsw-alias-bg-layer-1); }
+.backdrop[data-style='candy-gears'][data-running='true'] .gearSpin { animation: gear-spin 3.2s linear infinite; }
+.backdrop[data-style='candy-gears'][data-running='true'] .gearSpinReverse { animation: gear-spin-reverse 2.8s linear infinite; }
+
+/* Moonlit Coral Bay — layered reef silhouettes and light cone for 2.5D depth. */
+.moonSea { fill: color-mix(in srgb, var(--dsw-alias-bg-base) 70%, var(--dsw-alias-state-business-primary)); }
+.moonGlow { fill: color-mix(in srgb, var(--dsw-alias-state-business-tertiary) 68%, var(--dsw-alias-bg-layer-1)); }
+.moonRay { fill: color-mix(in srgb, var(--dsw-alias-state-business-tertiary) 24%, transparent); }
+.bubbles { fill: none; stroke: color-mix(in srgb, var(--dsw-alias-state-business-primary) 56%, transparent); stroke-width: 2; }
+.coralBack { fill: none; stroke: color-mix(in srgb, var(--dsw-alias-state-business-primary) 34%, var(--dsw-alias-label-tertiary)); stroke-width: 13; stroke-linecap: round; }
+.coralPlatforms { fill: color-mix(in srgb, var(--dsw-alias-state-business-secondary) 50%, var(--dsw-alias-label-tertiary)); }
+.coralPlatforms .coralTop { fill: color-mix(in srgb, var(--dsw-alias-state-error-tertiary) 63%, var(--dsw-alias-bg-layer-1)); }
+.coralPlants { fill: none; stroke: var(--dsw-alias-state-error-primary); stroke-width: 10; stroke-linecap: round; }
+.jellyfish { fill: color-mix(in srgb, var(--dsw-alias-state-error-tertiary) 72%, var(--dsw-alias-bg-layer-1)); stroke: var(--dsw-alias-state-error-primary); stroke-width: 2; }
+.jellyfish .jellyTails { fill: none; stroke-linecap: round; }
+.shell { fill: var(--dsw-alias-state-error-tertiary); stroke: var(--dsw-alias-state-error-primary); stroke-width: 2.5; }
+.shellLine { fill: none; stroke: var(--dsw-alias-state-error-primary); stroke-width: 2; stroke-linecap: round; }
+.moonPearl { fill: var(--dsw-alias-bg-layer-1); stroke: var(--dsw-alias-state-business-primary); stroke-width: 2; }
+.fish { fill: var(--dsw-alias-state-business-primary); }
+.backdrop[data-style='moon-coral'][data-running='true'] .jellyfish { animation: jelly-drift 2.8s ease-in-out infinite alternate; }
+.backdrop[data-style='moon-coral'][data-running='true'] .bubbles { animation: bubble-rise 4s linear infinite; }
+
+@keyframes runner-hop {
+  0%, 100% { transform: translate(0, 0) rotate(0); }
+  45% { transform: translate(28px, -24px) rotate(5deg); }
+  52% { transform: translate(32px, -25px) rotate(4deg); }
+}
+
+@keyframes scarf-wave { from { transform: rotate(-5deg) scaleX(.92); } to { transform: rotate(7deg) scaleX(1.08); } }
+@keyframes collectible-float { from { transform: translateY(0) rotate(-3deg); } to { transform: translateY(-9px) rotate(4deg); } }
+@keyframes cloud-drift { from { transform: translateX(-8px); } to { transform: translateX(18px); } }
+@keyframes bell-sway { from { transform: rotate(-6deg); } to { transform: rotate(7deg); } }
+@keyframes gear-spin { to { transform: rotate(360deg); } }
+@keyframes gear-spin-reverse { to { transform: rotate(-360deg); } }
+@keyframes jelly-drift { from { transform: translateY(0); } to { transform: translateY(-14px); } }
+@keyframes bubble-rise { from { transform: translateY(16px); opacity: .35; } to { transform: translateY(-26px); opacity: .9; } }
+
+@media (max-width: 720px) {
+  .depth { display: none; }
+  .switcher { padding-right: 5px; }
+  .select { max-width: 92px; }
+  .worldLabel { right: 12px; bottom: 10px; }
+  .worldArt { width: 130%; margin-left: -15%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop * { animation-duration: 1ms !important; animation-iteration-count: 1 !important; }
+  .switcher { transition-duration: 1ms; }
+}

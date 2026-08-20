@@ -3,12 +3,18 @@
     - button "workspace" [disabled]
   - img
   - text: Standard mode
+  - combobox "Scene style":
+    - option "Cloud Harbor" [selected]
+    - option "Candy Gearworks"
+    - option "Moonlit Coral Bay"
+  - text: 2.5D
   - button "Session log":
     - text: Session log
     - img
   - tablist:
     - tab "Chat" [selected]
     - tab "Trajectory"
+- region "Cloud Harbor · Ready to explore": Cloud Harbor
 - group "Command input": /goal
 - 'button "goal No goal is currently set. Usage: /goal [<objective>|clear|edit <objective>|pause|resume]"':
   - img

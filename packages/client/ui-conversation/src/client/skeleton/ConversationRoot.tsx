@@ -43,7 +43,9 @@ export function ConversationRoot({
     const scroller = seat?.parentElement ?? null
     if (seat === null || scroller === null) return
     seatObserver.current = new ResizeObserver(() => {
-      scroller.style.setProperty('--dsh-composer-height', `${seat.offsetHeight}px`)
+      const height = `${seat.offsetHeight}px`
+      scroller.style.setProperty('--dsh-composer-height', height)
+      scroller.parentElement?.style.setProperty('--dsh-composer-height', height)
     })
     seatObserver.current.observe(seat)
   }, [])
@@ -159,7 +161,7 @@ export function ConversationRoot({
   const composerBar = (
     <div className={clsx(css.composerStack, hero && css.composerHero)}>
       {hero && <HeroGlow className={css.heroGlow} />}
-      {hero && <HeroShell t={t} />}
+      {hero && <HeroShell t={t} renderSlot={renderSlot} />}
       {hero && heroWorkspaceRow}
       {zone !== undefined && renderSlot('conversation.input.dock', zone)}
       {inputBar}
@@ -186,6 +188,16 @@ export function ConversationRoot({
   return (
     <div className={css.root} data-phase={phase}>
       {renderSlot('conversation.session.header', {})}
+      {!hero && !settling && (
+        <div className={css.viewportBackground} data-conversation-viewport-background="">
+          {renderSlot('conversation.viewport.background', {})}
+        </div>
+      )}
+      {!hero && !settling && (
+        <div className={css.viewportOverlay} data-conversation-viewport-overlay="">
+          {renderSlot('conversation.viewport.overlay', {})}
+        </div>
+      )}
       <div className={css.scrollBody} data-conversation-scroll="">
         {renderSlot('conversation.session', {})}
         {composerSeat}

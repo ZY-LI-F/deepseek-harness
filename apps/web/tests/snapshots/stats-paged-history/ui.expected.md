@@ -1,13 +1,21 @@
 - banner:
   - navigation "Session hierarchy":
     - button "{{workspace}}" [disabled]
+  - combobox "Scene style":
+    - option "Cloud Harbor" [selected]
+    - option "Candy Gearworks"
+    - option "Moonlit Coral Bay"
+  - text: 2.5D
   - button "Session log":
     - text: Session log
     - img
   - tablist:
     - tab "Chat" [selected]
     - tab "Trajectory"
-- text: m1 7/25 {{clock}}
+- region "Cloud Harbor · Ready to explore": Cloud Harbor
+- text: Whale Girl’s Task Garden
+- status: Today’s flower is in bloom
+- text: 28 turns completed m1 7/25 {{clock}}
 - button "Copy":
   - img
 - paragraph: r1
