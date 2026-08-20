@@ -10,9 +10,9 @@ import { bindSnapshotSelector } from '@deepseek-ai/dsh-client-test-runtime'
 import { conversationSnapshot, makeTranslate } from '@deepseek-ai/dsh-client-test-runtime'
 import type { SessionStatsProjection } from '@deepseek-ai/dsh-session-stats/client'
 import {
-  deriveCaretakerTaskInterlude, deriveCaretakerWateringGeometry, deriveVineRingStates,
-  deriveWateringGeometry, TaskGarden, VINE_RING_FADE_MS, VINE_RING_GROWTH_MS,
-  VINE_RING_LIFETIME_MS, type TaskGardenProps,
+  deriveBlossomPlacement, deriveCaretakerTaskInterlude, deriveCaretakerWateringGeometry,
+  deriveVineRingStates, deriveWateringGeometry, isBlossomInRollingWindow, TaskGarden,
+  VINE_RING_FADE_MS, VINE_RING_GROWTH_MS, VINE_RING_LIFETIME_MS, type TaskGardenProps,
 } from '../src/client/TaskGarden.tsx'
 import { deriveGardenGrowth } from '../src/client/growth.ts'
 import {
@@ -21,6 +21,7 @@ import {
 import { zh } from '../src/client/locales.ts'
 
 const sid = 'garden-session' as SessionId
+const MAX_TEST_FLIGHT_BATCH = 4
 let measured = { width: 900, height: 360 }
 let resize: ResizeObserverCallback | undefined
 
@@ -191,6 +192,23 @@ describe('rolling vine ring lifecycle', () => {
   })
 })
 
+describe('rolling event-blossom rings', () => {
+  it('fills three layers before the fourth ring reuses the first layer', () => {
+    expect(deriveBlossomPlacement(0, 4)).toEqual({ slotIndex: 0, ringOrdinal: 0, ringLayer: 0 })
+    expect(deriveBlossomPlacement(3, 4)).toEqual({ slotIndex: 3, ringOrdinal: 0, ringLayer: 0 })
+    expect(deriveBlossomPlacement(4, 4)).toEqual({ slotIndex: 0, ringOrdinal: 1, ringLayer: 1 })
+    expect(deriveBlossomPlacement(8, 4)).toEqual({ slotIndex: 0, ringOrdinal: 2, ringLayer: 2 })
+    expect(deriveBlossomPlacement(12, 4)).toEqual({ slotIndex: 0, ringOrdinal: 3, ringLayer: 0 })
+  })
+
+  it('retires the first ring as soon as the fourth ring starts', () => {
+    expect(isBlossomInRollingWindow(0, 12, 4)).toBe(false)
+    expect(isBlossomInRollingWindow(4, 12, 4)).toBe(true)
+    expect(isBlossomInRollingWindow(8, 12, 4)).toBe(true)
+    expect(isBlossomInRollingWindow(12, 12, 4)).toBe(true)
+  })
+})
+
 describe('Whale Girl task choreography', () => {
   it('uses deterministic pseudo-random pauses to vary complete-character reactions', () => {
     const sequence = Array.from({ length: 18 }, (_, ordinal) => deriveCaretakerTaskInterlude(8162042, ordinal))
@@ -338,6 +356,49 @@ describe('TaskGarden presentation', () => {
     expect(b.view.container.querySelector('[data-garden-caretaker]')?.getAttribute('data-caretaker-action'))
       .toBe('watering-walk')
     expect(b.view.container.querySelector('[data-watering-flow="active"]')).toBeTruthy()
+  })
+
+  it('continues onto new event-flower rings and rolls the oldest ring away', () => {
+    vi.useFakeTimers()
+    const b = mount(stats(0, 0), 0, { running: true })
+    const root = b.view.container.querySelector('[data-task-garden]')
+    const slots = Number(root?.getAttribute('data-border-slots'))
+    expect(slots).toBeGreaterThanOrEqual(12)
+    const batches = Math.ceil(slots * 4 / MAX_TEST_FLIGHT_BATCH)
+
+    for (let batch = 0; batch < batches; batch++) {
+      const remaining = slots * 4 - batch * MAX_TEST_FLIGHT_BATCH
+      const count = Math.min(MAX_TEST_FLIGHT_BATCH, remaining)
+      act(() => {
+        b.snapshot.set({
+          ...b.snapshot.getSnapshot(),
+          runningCalls: Array.from(
+            { length: count },
+            (_, index) => runningTool(`ring-${batch}-${index}`),
+          ),
+        })
+      })
+      act(() => { vi.advanceTimersByTime(2_850) })
+    }
+
+    const attached = [...b.view.container.querySelectorAll('[data-attached-blossom]')]
+    expect(attached).toHaveLength(slots * 3)
+    expect(new Set(attached.map(element => element.getAttribute('data-blossom-ring'))))
+      .toEqual(new Set(['2', '3', '4']))
+    expect(new Set(attached.map(element => element.getAttribute('data-blossom-layer'))))
+      .toEqual(new Set(['1', '2', '3']))
+    expect(b.view.container.querySelector('[data-blossom-ring="1"]')).toBeNull()
+
+    const firstSlotByRing = [2, 3, 4].map(ring => (
+      b.view.container.querySelector<HTMLElement>(
+        `[data-blossom-ring="${ring}"][data-blossom-slot="0"]`,
+      )
+    ))
+    const coordinates = firstSlotByRing.map(element => [
+      element?.style.getPropertyValue('--attached-flower-x'),
+      element?.style.getPropertyValue('--attached-flower-y'),
+    ].join(','))
+    expect(new Set(coordinates).size).toBe(3)
   })
 
   it('bows, plays complete-character kiss cels, toasts, and settles into a wave on completion', () => {

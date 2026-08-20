@@ -35,13 +35,12 @@ const STAGE_LABELS: Record<GardenStage, `stage.${GardenStage}`> = {
 }
 
 const MAX_ACTIVE_FLIGHTS = 4
-const MAX_ATTACHED_BLOSSOMS = 48
 export const VINE_RING_GROWTH_MS = 10 * 60 * 1_000
 export const VINE_RING_INTERVAL_MS = VINE_RING_GROWTH_MS
 export const VINE_RING_LIFETIME_MS = 30 * 60 * 1_000
 export const VINE_RING_FADE_MS = 60 * 1_000
 const VINE_RING_LAYER_COUNT = VINE_RING_LIFETIME_MS / VINE_RING_INTERVAL_MS
-const VINE_RING_INSET_PX = 7
+const VINE_RING_GAP_RATIO = 1.22
 
 export interface VineRingState {
   ordinal: number
@@ -49,7 +48,7 @@ export interface VineRingState {
   progress: number
   opacity: number
   phase: 'growing' | 'mature' | 'fading'
-  inset: number
+  layer: number
   styleVariant: number
 }
 
@@ -79,7 +78,7 @@ export function deriveVineRingStates(elapsedMs: number, taskSeed = 0): readonly 
       progress,
       opacity,
       phase: progress < 1 ? 'growing' : ageMs > fadeStart ? 'fading' : 'mature',
-      inset: ordinal % VINE_RING_LAYER_COUNT * VINE_RING_INSET_PX,
+      layer: ordinal % VINE_RING_LAYER_COUNT,
       styleVariant: (styleBase + ordinal) % styleCount,
     })
   }
@@ -127,7 +126,7 @@ interface GardenFlight {
   id: string
   art: string
   name: string
-  targetIndex: number
+  sequence: number
   driftX: number
   driftY: number
   spin: number
@@ -137,8 +136,39 @@ interface GardenBloom {
   id: string
   art: string
   name: string
-  targetIndex: number
+  sequence: number
   tilt: number
+}
+
+/** Responsive ring coordinates derived for one event blossom. */
+export interface BlossomPlacement {
+  slotIndex: number
+  ringOrdinal: number
+  ringLayer: number
+}
+
+/** Map one event flower onto an unbounded ring sequence and a rolling visual layer. */
+export function deriveBlossomPlacement(sequence: number, slotCount: number): BlossomPlacement {
+  const safeSlotCount = Number.isFinite(slotCount) ? Math.max(1, Math.floor(slotCount)) : 1
+  const safeSequence = Number.isFinite(sequence) ? Math.max(0, Math.floor(sequence)) : 0
+  const ringOrdinal = Math.floor(safeSequence / safeSlotCount)
+  return {
+    slotIndex: safeSequence % safeSlotCount,
+    ringOrdinal,
+    ringLayer: ringOrdinal % VINE_RING_LAYER_COUNT,
+  }
+}
+
+/** Retain the current event-flower ring and its two immediate predecessors. */
+export function isBlossomInRollingWindow(
+  sequence: number,
+  newestSequence: number,
+  slotCount: number,
+): boolean {
+  const flower = deriveBlossomPlacement(sequence, slotCount)
+  const newest = deriveBlossomPlacement(newestSequence, slotCount)
+  return flower.ringOrdinal >= Math.max(0, newest.ringOrdinal - VINE_RING_LAYER_COUNT + 1)
+    && flower.ringOrdinal <= newest.ringOrdinal
 }
 
 interface GardenAnimationState {
@@ -426,6 +456,24 @@ const VINE_INWARD_OFFSETS: Record<ResponsiveGardenLayout['slots'][number]['edge'
   'top-left': [.707, .707],
 }
 
+function vineRingInset(layout: ResponsiveGardenLayout, layer: number): number {
+  return Math.max(0, Math.floor(layer)) * layout.flowerSize * VINE_RING_GAP_RATIO
+}
+
+function blossomAnchor(layout: ResponsiveGardenLayout, sequence: number) {
+  const placement = deriveBlossomPlacement(sequence, layout.slots.length)
+  const slot = layout.slots[placement.slotIndex]
+  if (slot === undefined) return null
+  const inward = VINE_INWARD_OFFSETS[slot.edge]
+  const inset = vineRingInset(layout, placement.ringLayer)
+  return {
+    ...placement,
+    slot,
+    x: slot.x + inward[0] * inset,
+    y: slot.y + inward[1] * inset,
+  }
+}
+
 function BorderVine({
   index, layout, ring, taskSeed, segmentProgress = 1, waiting = false,
 }: {
@@ -448,12 +496,13 @@ function BorderVine({
   const accentVariant = (seed >>> 8) % GARDEN_VINE_ACCENTS.length
   const accent = GARDEN_VINE_ACCENTS[accentVariant] ?? GARDEN_VINE_ACCENTS[0]
   const layered = !waiting && segmentProgress > .72 && index % 5 === ring.ordinal % 5
-  const layerScale = 1 - ring.inset / VINE_RING_INSET_PX * .075
+  const inset = vineRingInset(layout, ring.layer)
+  const layerScale = 1 - ring.layer * .075
   const width = Math.max(compact ? 92 : 112, layout.flowerSize * (compact ? 3.5 : 4.5)) * layerScale
   const height = Math.max(compact ? 23 : 35, layout.flowerSize * (compact ? .76 : 1.08)) * layerScale
   const inward = VINE_INWARD_OFFSETS[slot.edge]
-  const x = slot.x + inward[0] * ring.inset
-  const y = slot.y + inward[1] * ring.inset
+  const x = slot.x + inward[0] * inset
+  const y = slot.y + inward[1] * inset
   const reveal = Math.min(1, Math.max(0, segmentProgress))
   const frontier = waiting || reveal < 1
   const style = {
@@ -584,7 +633,8 @@ function VineLauncher({ layout }: { layout: ResponsiveGardenLayout }) {
 /** A time-derived dash reveals one adaptive rounded ring without a fixed viewport size. */
 function VineProgressTrack({ layout, ring }: { layout: ResponsiveGardenLayout; ring: VineRingState }) {
   if (layout.slots.length === 0) return null
-  const geometry = ringGeometry(layout, ring.inset)
+  const inset = vineRingInset(layout, ring.layer)
+  const geometry = ringGeometry(layout, inset)
   const palette = VINE_STEM_PALETTES[ring.styleVariant % VINE_STEM_PALETTES.length]
     ?? VINE_STEM_PALETTES[0]
   const style = {
@@ -594,7 +644,7 @@ function VineProgressTrack({ layout, ring }: { layout: ResponsiveGardenLayout; r
     '--vine-stem-shadow': palette[0],
     '--vine-stem-highlight': palette[1],
   } as CSSProperties
-  const connector = ring.inset > 0
+  const connector = inset > 0
     ? `M 0 ${geometry.startY} L ${geometry.left} ${geometry.startY}`
     : null
   return (
@@ -714,11 +764,12 @@ function BlueFlowerAccent({
   const slot = layout.slots[slotIndex]
   if (slot === undefined) return null
   const inward = VINE_INWARD_OFFSETS[slot.edge]
+  const inset = vineRingInset(layout, ring.layer)
   const compact = slot.edge === 'bottom' || slot.edge === 'bottom-left' || slot.edge === 'bottom-right'
   const size = Math.min(compact ? 50 : 70, Math.max(compact ? 42 : 50, layout.flowerSize * 2.15))
   const style = {
-    '--blue-flower-x': `${slot.x + inward[0] * ring.inset}px`,
-    '--blue-flower-y': `${slot.y + inward[1] * ring.inset}px`,
+    '--blue-flower-x': `${slot.x + inward[0] * inset}px`,
+    '--blue-flower-y': `${slot.y + inward[1] * inset}px`,
     '--blue-flower-size': `${size}px`,
     '--blue-flower-tilt': `${(ring.ordinal % 3 - 1) * 7}deg`,
   } as CSSProperties
@@ -793,10 +844,10 @@ function FlightFlower({
     const fallback = window.setTimeout(settle, 2_850)
     return () => { window.clearTimeout(fallback) }
   }, [settle])
-  const slot = layout.slots[Math.min(flight.targetIndex, layout.slots.length - 1)]
-  if (slot === undefined) return null
-  const targetX = slot.x - layout.emitter.x
-  const targetY = slot.y - layout.emitter.y
+  const anchor = blossomAnchor(layout, flight.sequence)
+  if (anchor === null) return null
+  const targetX = anchor.x - layout.emitter.x
+  const targetY = anchor.y - layout.emitter.y
   const style = {
     '--flight-origin-x': `${layout.emitter.x}px`,
     '--flight-origin-y': `${layout.emitter.y}px`,
@@ -808,7 +859,7 @@ function FlightFlower({
     '--flight-near-y': `${targetY * .88 + flight.driftY * .12}px`,
     '--flight-target-x': `${targetX}px`,
     '--flight-target-y': `${targetY}px`,
-    '--flight-angle': `${slot.angle}deg`,
+    '--flight-angle': `${anchor.slot.angle}deg`,
     '--flight-spin': `${flight.spin}deg`,
     '--flight-width': `${layout.flowerSize * 1.18}px`,
     '--flight-height': `${layout.flowerSize * 1.18}px`,
@@ -817,6 +868,10 @@ function FlightFlower({
     <img
       className={css.flightFlower}
       data-blossom-form="head-only"
+      data-blossom-layer={anchor.ringLayer + 1}
+      data-blossom-ring={anchor.ringOrdinal + 1}
+      data-blossom-sequence={flight.sequence}
+      data-blossom-slot={anchor.slotIndex}
       data-flight-flower=""
       data-flower-name={flight.name}
       src={flight.art}
@@ -829,21 +884,25 @@ function FlightFlower({
 }
 
 function AttachedBlossom({ bloom, layout }: { bloom: GardenBloom; layout: ResponsiveGardenLayout }) {
-  const slot = layout.slots[Math.min(bloom.targetIndex, layout.slots.length - 1)]
-  if (slot === undefined) return null
+  const anchor = blossomAnchor(layout, bloom.sequence)
+  if (anchor === null) return null
   return (
     <img
       className={css.attachedBlossom}
       data-attached-blossom={bloom.id}
       data-attachment-gap="0"
       data-blossom-form="head-only"
+      data-blossom-layer={anchor.ringLayer + 1}
+      data-blossom-ring={anchor.ringOrdinal + 1}
+      data-blossom-sequence={bloom.sequence}
+      data-blossom-slot={anchor.slotIndex}
       data-flower-name={bloom.name}
       src={bloom.art}
       alt=""
       draggable={false}
       style={{
-        '--attached-flower-x': `${slot.x}px`,
-        '--attached-flower-y': `${slot.y}px`,
+        '--attached-flower-x': `${anchor.x}px`,
+        '--attached-flower-y': `${anchor.y}px`,
         '--attached-flower-size': `${layout.flowerSize * 1.18}px`,
         '--attached-flower-tilt': `${bloom.tilt}deg`,
       } as CSSProperties}
@@ -1216,17 +1275,14 @@ export function TaskGarden({ sessionId, useSession, useProjection, t, playSound 
     const ordinal = flightOrdinal.current++
     setAnimation((current) => {
       if (current.flights.length >= MAX_ACTIVE_FLIGHTS) return current
-      const targetIndex = Math.min(
-        layout.slots.length - 1,
-        current.runUnits + current.flights.length,
-      )
+      const sequence = current.runUnits + current.flights.length
       return {
         ...current,
         flights: [...current.flights, {
           id: `${eventId}:${ordinal}`,
           art: flower.art,
           name: flower.name,
-          targetIndex,
+          sequence,
           driftX: seed % 2 === 0 ? 18 + seed % 17 : -18 - seed % 13,
           driftY: -28 - seed % 24,
           spin: seed % 2 === 0 ? 14 + seed % 18 : -14 - seed % 18,
@@ -1271,24 +1327,49 @@ export function TaskGarden({ sessionId, useSession, useProjection, t, playSound 
     playSound('garden-grow')
   }, [enqueueFlight, layout.slots.length, playSound, running, steps])
 
+  useEffect(() => {
+    if (layout.slots.length === 0) return
+    setAnimation((current) => {
+      if (current.blooms.length === 0) return current
+      const newestSequence = current.blooms.reduce(
+        (newest, bloom) => Math.max(newest, bloom.sequence),
+        0,
+      )
+      const blooms = current.blooms.filter(bloom => isBlossomInRollingWindow(
+        bloom.sequence,
+        newestSequence,
+        layout.slots.length,
+      ))
+      return blooms.length === current.blooms.length ? current : { ...current, blooms }
+    })
+  }, [layout.slots.length])
+
   const onLand = useCallback((id: string) => {
     setAnimation((current) => {
       const landed = current.flights.find(flight => flight.id === id)
       if (landed === undefined) return current
+      const newestSequence = current.blooms.reduce(
+        (newest, bloom) => Math.max(newest, bloom.sequence),
+        landed.sequence,
+      )
       const blooms = [...current.blooms, {
         id: `attached:${landed.id}`,
         art: landed.art,
         name: landed.name,
-        targetIndex: landed.targetIndex,
+        sequence: landed.sequence,
         tilt: Math.round(landed.spin * .35),
-      }].slice(-MAX_ATTACHED_BLOSSOMS)
+      }].filter(bloom => isBlossomInRollingWindow(
+        bloom.sequence,
+        newestSequence,
+        layout.slots.length,
+      ))
       return {
         runUnits: current.runUnits + 1,
         flights: current.flights.filter(flight => flight.id !== id),
         blooms,
       }
     })
-  }, [])
+  }, [layout.slots.length])
 
   const borderVines = rings.reduce(
     (total, ring) => total + Math.min(layout.slots.length, Math.ceil(ring.progress * layout.slots.length)),
