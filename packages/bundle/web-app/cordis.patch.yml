@@ -294,6 +294,11 @@
     - id: ui-trajectory
       name: '@deepseek-ai/dsh-client-ui-trajectory'
 
+    # Read-only graph of the active execution branch plus the information
+    # sources observably available at each recorded position.
+    - id: ui-task-knowledge-map
+      name: '@deepseek-ai/dsh-client-ui-task-knowledge-map'
+
 # ── the agent plane moves behind agent presets ─────────────────────────────
 #
 # Every row below composes what ONE agent contributes to the host registries:
