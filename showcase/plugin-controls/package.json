@@ -1,0 +1,16 @@
+{
+  "name": "@deepseek-ai/dsh-plugin-controls",
+  "version": "0.1.0",
+  "description": "Persistent enable and disable controls for installed DSH extensions",
+  "type": "module",
+  "license": "MIT",
+  "exports": { ".": "./host.mjs", "./client": "./lib/client.js", "./package.json": "./package.json" },
+  "files": ["host.mjs", "patch-store.mjs", "cordis.patch.yml", "lib/client.js", "README.md", "README.zh.md"],
+  "dsh": {
+    "bundle": { "patch": "./cordis.patch.yml" },
+    "client": { "platform": "web", "inject": ["@deepseek-ai/dsh-client-ui-settings", "@deepseek-ai/dsh-client-connection"] }
+  },
+  "peerDependencies": { "@deepseek-ai/cordis": "^4.0.2" },
+  "dependencies": { "@deepseek-ai/dsh-home-paths": "0.1.2-alpha.4", "yaml": "2.8.2", "zod": "4.5.4" },
+  "devDependencies": { "@deepseek-ai/cordis": "^4.0.2" }
+}

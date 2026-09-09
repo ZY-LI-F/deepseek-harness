@@ -1,0 +1,6 @@
+- insert:
+    - id: plugin-controls
+      name: '@deepseek-ai/dsh-plugin-controls'
+      config:
+        profile: web
+        settleTimeoutMs: 8000

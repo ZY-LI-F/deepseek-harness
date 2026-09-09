@@ -1,0 +1,6 @@
+- insert:
+    - id: generative-ui
+      name: '@deepseek-ai/dsh-generative-ui'
+      config:
+        maxDocumentBytes: 131072
+        promptOrder: 850
